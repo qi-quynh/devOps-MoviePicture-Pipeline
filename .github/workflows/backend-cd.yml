@@ -87,7 +87,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
           aws-region: us-east-1
           
-      - name: Build Docker Image
+      - name: Build Push Docker Image
         run: |
           aws eks update-kubeconfig --name cluster --region us-east-1
           kubectl get svc
