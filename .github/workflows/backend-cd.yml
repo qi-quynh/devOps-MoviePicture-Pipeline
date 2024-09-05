@@ -89,7 +89,8 @@ jobs:
           docker build -t ${{env.IMAGE_REPO_NAME}} .
           docker tag ${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}} 310722232770.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
           docker push 310722232770.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
-      
+          docker logs -f ${{env.IMAGE_REPO_NAME}}
+
       - name: Configure Kubeconfig Auth
         working-directory: starter/backend/k8s
         run: |
