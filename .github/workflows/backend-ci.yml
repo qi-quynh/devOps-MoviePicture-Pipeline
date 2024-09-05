@@ -6,10 +6,11 @@ on:
   push:
     branches:
       - main
-  
+# Define environment 
 env:
-  PYTHON_VERSION: 3.12.1
   IMAGE_REPO_NAME: backend
+  PY_VERSION: 3.12.1
+  
 
 jobs:
   lint_job:
@@ -19,13 +20,14 @@ jobs:
       run:
         working-directory: ./starter/backend
     steps:
+      # Check out the code from the repository. 
       - name: Check out repository
         uses: actions/checkout@v3
       
       - name: Use Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{env.PYTHON_VERSION}}
+          python-version: ${{env.PY_VERSION}}
       
       - name: Install tools
         run: |
@@ -42,13 +44,14 @@ jobs:
       run:
         working-directory: ./starter/backend
     steps:
+      # Check out the code from the repository. 
       - name: Check out repository
         uses: actions/checkout@v3
       
       - name: Use Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{env.PYTHON_VERSION}}
+          python-version: ${{env.PY_VERSION}}
       
       - name: Install tests dependencies
         run: |
@@ -70,6 +73,7 @@ jobs:
       run:
         working-directory: ./starter/backend
     steps:
+      # Check out the code from the repository. 
       - name: Check out repository
         uses: actions/checkout@v3
         

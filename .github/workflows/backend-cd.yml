@@ -3,11 +3,12 @@ on:
   push:
     branches: [ "main" ]
   workflow_dispatch:
-  
+# Define environment  
 env:
-  PYTHON_VERSION: 3.12.1
   IMAGE_REPO_NAME: backend
+  PY_VERSION: 3.12.1
   IMAGE_TAG: latest
+
 jobs:
   linting_job:
     name: linting job
@@ -16,15 +17,16 @@ jobs:
       run:
         working-directory: ./starter/backend
     steps:
+      # Check out the code from the repository. 
       - name: Check out repository
         uses: actions/checkout@v3
       
-      - name: Use Python Environment
+      - name: Use Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{env.PYTHON_VERSION}}
+          python-version: ${{env.PY_VERSION}}
       
-      - name: Install Linting Tools and Pipenv
+      - name: Install pipenv dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pipenv flake8
@@ -39,13 +41,14 @@ jobs:
       run:
         working-directory: ./starter/backend
     steps:
+      # Check out the code from the repository. 
       - name: Check out repository
         uses: actions/checkout@v3
       
       - name: Use Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{env.PYTHON_VERSION}}
+          python-version: ${{env.PY_VERSION}}
       
       - name: Install python test dependencies
         run: |
@@ -59,14 +62,17 @@ jobs:
       - name: Run Backend Tests
         run: | 
           pipenv run test
+          
+  # Build job only when the lint and test jobs pass
   build:
-    name: BUILD JOB
+    name: Build job
     needs: [linting_job, test_job]
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./starter/backend
     steps:
+      # Check out the code from the repository.    
       - name: Check out repository
         uses: actions/checkout@v3
   
@@ -87,8 +93,8 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           docker build -t ${{env.IMAGE_REPO_NAME}} .
-          docker tag ${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}} 310722232770.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
-          docker push 310722232770.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
+          docker tag ${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}  ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
+          docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
 
       - name: Configure Kubeconfig Auth
         working-directory: starter/backend/k8s
@@ -98,13 +104,14 @@ jobs:
       - name: Deploy the Docker image to Amazon EKS
         run: |
           cd k8s
-          kustomize edit set image backend=310722232770.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
+          kustomize edit set image backend=${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
           kustomize build | kubectl apply -f -
-      - name: Verify Deployment Status
+      
+      - name: Check Status
         run: |
           if kubectl rollout status deployment/backend -n default --timeout=2m | grep -q 'deployment "backend" successfully rolled out'; then
-            echo "Deployment succeeded."
+            echo "Succeeded."
           else
-            echo "Deployment failed."
+            echo "Failed."
             exit 1
           fi
