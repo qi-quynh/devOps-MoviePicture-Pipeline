@@ -113,7 +113,8 @@ jobs:
           docker tag ${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}} 310722232770.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
           docker push 310722232770.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
         
-      - name: Configure kubectl
+      - name: Configure Kubeconfig Auth
+        working-directory: starter/frontend/k8s
         run: |
           aws eks update-kubeconfig --name cluster --region us-east-1
     
