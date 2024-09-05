@@ -2,8 +2,6 @@ name: CD BE Workflow
 on:
   push:
     branches: [ "main" ]
-    paths:
-      - 'starter/backend/**'
   workflow_dispatch:
   
 env:

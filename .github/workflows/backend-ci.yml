@@ -6,8 +6,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'starter/backend/**'
   
 env:
   PYTHON_VERSION: 3.12.1

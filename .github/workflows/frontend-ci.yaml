@@ -6,8 +6,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'starter/frontend/**'
   # on-demand
   workflow_dispatch:
 # Define environment
