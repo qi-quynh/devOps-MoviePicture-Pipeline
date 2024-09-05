@@ -2,6 +2,8 @@ name: CD BE Workflow
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'starter/backend/**'
   workflow_dispatch:
   
 env:
@@ -86,15 +88,12 @@ jobs:
           
       - name: Build and Push Docker Image
         run: |
-          aws eks update-kubeconfig --name cluster --region us-east-1
-          kubectl get svc
           docker build -t ${{env.IMAGE_REPO_NAME}} .
           docker tag ${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}} 310722232770.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
           docker push 310722232770.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
   
       - name: Deploy to AWS EKS
         run: |
-          aws eks update-kubeconfig --name cluster --region us-east-1
-          cd k8s
+          cd starter/backend/k8s
           kustomize edit set image backend=310722232770.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
           kustomize build | kubectl apply -f -

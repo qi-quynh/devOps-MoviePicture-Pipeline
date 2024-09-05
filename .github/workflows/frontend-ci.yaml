@@ -3,8 +3,11 @@ name: CI FE Workflow
 
 on:
   # Workflow runs when pull_request to the main branch  
-  pull_request:
-    branches: ["main"]
+  push:
+    branches:
+      - main
+    paths:
+      - 'starter/frontend/**'
   # on-demand
   workflow_dispatch:
 # Define environment

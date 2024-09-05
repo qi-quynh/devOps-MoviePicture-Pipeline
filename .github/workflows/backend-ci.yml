@@ -3,8 +3,11 @@ name: CI BE Workflow
 
 on:
   # Workflow runs when pull_request to the main branch  
-  pull_request:
-    branches: [ "main" ]
+  push:
+    branches:
+      - main
+    paths:
+      - 'starter/backend/**'
   
 env:
   PYTHON_VERSION: 3.12.1
