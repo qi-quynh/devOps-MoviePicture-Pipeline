@@ -1,0 +1,101 @@
+# Continuous Integration in Frontend workflow
+name: CI FE Workflow
+
+on:
+  # Workflow runs when pull_request to the main branch  
+  pull_request:
+    branches: ["main"]
+  # on-demand
+  workflow_dispatch:
+# Define environment
+env:
+  NODE_VERSION: 18.18.0
+  IMAGE_REPO_NAME: frontend
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # Runs a linting job that fails if the code doesn't adhere to eslint rules
+  linting_job:
+    name: linting job
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./starter/frontend
+    steps:
+      # Check out the code from the repository.  
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      # Set up a Node.js environment using the specified node version.
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{env.NODE_VERSION}}
+
+      # Cache node modules
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: npm-cache-${{ hashFiles('**/package-lock.json') }}
+
+      # Install the dependencies.
+      - name: Install the dependencies
+        run: |
+          npm ci
+          npm install eslint --save-dev
+      
+      # Run the linter.
+      - name: Run the linter
+        run: |
+          npm run lint
+
+  # Runs a test job that fails if the test suite doesn't pass
+  test_job:
+    name: test job
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./starter/frontend
+    steps:
+      # Check out the code from the repository.    
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      # Set up a Node.js environment using the specified node version.
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{env.NODE_VERSION}}
+
+      - name: Cache node modules
+        id: cache-npm-test
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: npm-cache-${{ hashFiles('**/package-lock.json') }}
+    
+      # Install the dependencies.    
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install prettier --save-dev
+
+      - name: Run tests
+        run: npm run test
+        
+# run the test and linting jobs
+  build:
+    name: build job
+    needs: [linting_job, test_job]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./starter/frontend
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Build Docker container image
+        run: |
+          docker build -t ${{env.IMAGE_REPO_NAME}}:latest .
