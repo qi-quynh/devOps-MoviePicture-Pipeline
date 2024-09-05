@@ -106,10 +106,7 @@ jobs:
       - name:  Build, tag, and push image to Amazon ECR
         working-directory: starter/frontend
         run: |
-          kubectl get svc
-          export EXTERNALIP=$(kubectl get svc backend -o=jsonpath='{.status.loadBalancer.ingress[0].hostname}{"\n"}{.status.loadBalancer.ingress[0].ip}')
-          echo "EXTERNALIP=$EXTERNALIP"
-          docker build --build-arg REACT_APP_MOVIE_API_URL=http://$EXTERNALIP -t ${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}} .
+          docker build --build-arg REACT_APP_MOVIE_API_URL=http://localhost:5000 -t ${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}} .
           docker tag ${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}} 310722232770.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
           docker push 310722232770.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
         
