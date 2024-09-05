@@ -96,7 +96,7 @@ jobs:
           aws eks update-kubeconfig --name cluster --region us-east-1
 
       - name: Deploy the Docker image to Amazon EKS
-        working-directory: starter/backend/k8s
         run: |
+          cd starter/backend/k8s
           kustomize edit set image backend=310722232770.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
           kustomize build | kubectl apply -f -
