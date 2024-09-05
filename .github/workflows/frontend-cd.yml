@@ -117,7 +117,7 @@ jobs:
     
       - name: Set image tag and apply to cluster
         run: |
-          cd starter/frontend/k8s
+          cd k8s
           kustomize edit set image frontend=310722232770.dkr.ecr.us-east-1.amazonaws.com/frontend:latest
           kustomize build | kubectl apply -f -
   
