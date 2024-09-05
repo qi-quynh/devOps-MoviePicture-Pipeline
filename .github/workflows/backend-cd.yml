@@ -1,8 +1,5 @@
-# Continuous Deployment in Backend workflow
 name: CD BE Workflow
-
 on:
-  # Workflow runs when push to the main branch     
   push:
     branches: [ "main" ]
   workflow_dispatch:
@@ -22,7 +19,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
       
-      - name: Use Python 
+      - name: Use Python Environment
         uses: actions/setup-python@v4
         with:
           python-version: ${{env.PYTHON_VERSION}}
@@ -36,7 +33,7 @@ jobs:
         run: |
           pipenv install
   test_job: 
-    name: test job
+    name: tests job
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -59,11 +56,11 @@ jobs:
         run: |
           pipenv install
   
-      - name: Run Tests in Backend
+      - name: Run Backend Tests
         run: | 
           pipenv run test
   build:
-    name: build job 
+    name: BUILD JOB
     needs: [linting_job, test_job]
     runs-on: ubuntu-latest
     defaults:
@@ -87,106 +84,17 @@ jobs:
           aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
           aws-region: us-east-1
           
-name: Backend Continuous Deployment
-
-on:
-  # push:
-  #   branches:
-  #     - main
-  #   paths:
-  #     - 'starter/frontend/**'
-  workflow_dispatch:  # Allow manual triggering
-  pull_request:
-    types: [closed]
-    branches:
-      - main
-
-jobs:
-  Linting:
-    if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    environment: Devlopment Environment
-
-    steps:
-    - name: Check the Repository
-      uses: actions/checkout@v3
-
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: " 3.12.1"
-
-    - name: Install Rependencies
-      working-directory: starter/backend 
-      run:  |
-        python -m pip install --upgrade pip
-        pip install pipenv
-        pip install flake8
-
-    - name: Checkout Run Lint
-      run: cd starter/backend && pipenv run lint
-
-  Test:
-    if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Check the Repository
-      uses: actions/checkout@v3
-
-    - name: Use Python 3
-      uses:  actions/setup-python@v4
-      with:
-        python-version: " 3.12.1"
-
-    - name: Install Dependencies
-      working-directory: starter/backend 
-      run:  |
-        python -m pip install --upgrade pip
-        pip install pipenv
-        pip install flake8
-
-    - name: Test
-      run: cd starter/backend && pipenv install pytest && pipenv run test
-
-      
-  Build:
-    needs: [Linting, Test]
-    runs-on: ubuntu-latest
-    environment: Devlopment Environment
-    steps:
-    - name: Check the Repository
-      uses: actions/checkout@v3
-
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v3
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
-        
-    - name: Login to Amazon
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v2
-
-    - name: Build and Push Docker Image
-      working-directory: starter/backend
-      env:
-        IMAGE_TAG: latest
-        REPO_NAME: backend
-      run: |
-        docker build --build-arg=REACT_APP_MOVIE_API_URL=http://localhost:5000 --tag 310722232770.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG .
-        docker push 310722232770.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
-    - name: Update Kubeconfig
-      run:
-       aws eks update-kubeconfig --name cluster --region us-east-1
-
-    - name: Deploy Docker
-      working-directory: starter/backend/k8s
-      env:
-        IMAGE_TAG: latest
-        REPO_NAME: backend
-      run: |
-        aws eks update-kubeconfig --name cluster --region us-east-1
-        kustomize edit set image backend=310722232770.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
-        kustomize build | kubectl apply -f -
+      - name: Build and Push Docker Image
+        run: |
+          aws eks update-kubeconfig --name cluster --region us-east-1
+          kubectl get svc
+          docker build -t ${{env.IMAGE_REPO_NAME}} .
+          docker tag ${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}} 310722232770.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
+          docker push 310722232770.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
+  
+      - name: Deploy to AWS EKS
+        run: |
+          aws eks update-kubeconfig --name cluster --region us-east-1
+          cd k8s
+          kustomize edit set image backend=310722232770.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
+          kustomize build | kubectl apply -f -
