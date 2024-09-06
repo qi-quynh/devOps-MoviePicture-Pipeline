@@ -103,9 +103,9 @@ jobs:
         run: |
           aws eks update-kubeconfig --name cluster --region us-east-1
           kubectl get svc
-          export EXTERNALIP=$(kubectl get svc backend -o=jsonpath='{.status.loadBalancer.ingress[0].hostname}{"\n"}{.status.loadBalancer.ingress[0].ip}')
-          echo "EXTERNALIP=$EXTERNALIP"
-          docker build --build-arg REACT_APP_MOVIE_API_URL=http://$EXTERNALIP -t ${{env.IMAGE_NAME}}:${{env.IMAGE_TAG}} .
+          export ADRESSIP=$(kubectl get svc backend -o=jsonpath='{.status.loadBalancer.ingress[0].hostname}{"\n"}{.status.loadBalancer.ingress[0].ip}')
+          echo "ADRESSIP=$ADRESSIP"
+          docker build --build-arg REACT_APP_MOVIE_API_URL=http://$ADRESSIP -t ${{env.IMAGE_NAME}}:${{env.IMAGE_TAG}} .
           docker tag ${{env.IMAGE_NAME}}:${{env.IMAGE_TAG}} 310722232770.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_NAME}}:${{env.IMAGE_TAG}}
           docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_NAME}}:${{env.IMAGE_TAG}}
 
