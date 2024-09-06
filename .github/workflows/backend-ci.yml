@@ -1,9 +1,10 @@
 name: CI Backend 
 
 on:
-  pull_request:
+  push:
     branches: 
       - main
+
 # Define Environment 
 env:
   PY_VERSION: 3.12.1

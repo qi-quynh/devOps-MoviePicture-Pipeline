@@ -115,3 +115,12 @@ jobs:
           cd k8s
           kustomize edit set image frontend=${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_NAME}}:${{env.IMAGE_TAG}}
           kustomize build | kubectl apply -f -
+
+      # - name: Check Status
+      #   run: |
+      #     if kubectl rollout status deployment/frontend -n default --timeout=2m | grep -q 'deployment "frontend" successfully rolled out'; then
+      #       echo "Succeeded."
+      #     else
+      #       echo "Failed."
+      #       exit 1
+      #     fi
