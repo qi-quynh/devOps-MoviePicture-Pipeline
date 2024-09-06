@@ -319,6 +319,8 @@ docker run --name mp-frontend -p 3000:3000 -d mp-frontend]
 In order to build the Kubernetes manifests correctly, the team uses `kustomize` in the following way:
 
 ```bash
+
+
 cd starter/frontend/k8s
 # Make sure you're kubeconfig is configured for the EKS cluster, i.e.
 # aws eks update-kubeconfig
