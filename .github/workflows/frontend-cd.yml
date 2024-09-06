@@ -66,7 +66,7 @@ jobs:
           path: ~/.npm
           key: npm-cache-${{ hashFiles('**/package-lock.json') }}
   
-      - name: Install dependencies
+      - name: Install project dependencies
         run: |
           npm ci
           npm install prettier --save-dev
@@ -99,7 +99,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
           aws-region: us-east-1
           
-      - name: Build and Push Docker Image
+      - name: Build Docker Image
         run: |
           aws eks update-kubeconfig --name cluster --region us-east-1
           kubectl get svc
@@ -113,7 +113,7 @@ jobs:
         run: |
           aws eks update-kubeconfig --name cluster --region us-east-1
 
-      - name: Deploy to AWS EKS
+      - name: Deploy to Kubernetes
         run: |
           cd k8s
           kustomize edit set image frontend=${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_NAME}}:${{env.IMAGE_TAG}}
