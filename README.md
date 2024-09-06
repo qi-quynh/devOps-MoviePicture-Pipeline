@@ -9,6 +9,12 @@ The team's project is comprised of 2 applications.
 
 You'll find 2 folders, one named `frontend` and one named `backend`, where each application's source code is maintained. Your job is to use the team's [existing documentation](#frontend-development-notes) and create CI/CD pipelines to meet the teams' needs.
 
+### Outout
+Link Backend: 
+http://a8881fa6c73a549d69751e4fb0bc6ebd-1817487359.us-east-1.elb.amazonaws.com/movies
+Link Frontend:
+http://a0e26740bfee74c779a133d5ccfdd1da-126635731.us-east-1.elb.amazonaws.com/
+
 ## Deliverables
 
 ### Frontend
