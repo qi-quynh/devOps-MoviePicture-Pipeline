@@ -1,11 +1,12 @@
-name: Backend Continuous Deployment
+name: CD Backend
 on:
   push:
-    branches: [ "main" ]
+    branches: 
+      - main
   workflow_dispatch:
-  
+# Define Environment 
 env:
-  PYTHON_VERSION: 3.12.1
+  PY_VERSION: 3.12.1
   IMAGE_NAME: backend
   IMAGE_TAG: latest
 jobs:
@@ -22,7 +23,7 @@ jobs:
       - name: Setup Python Environment
         uses: actions/setup-python@v4
         with:
-          python-version: ${{env.PYTHON_VERSION}}
+          python-version: ${{env.PY_VERSION}}
       
       - name: Install Linting Tools and Pipenv
         run: |
@@ -45,7 +46,7 @@ jobs:
       - name: Use Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{env.PYTHON_VERSION}}
+          python-version: ${{env.PY_VERSION}}
       
       - name: Install Testing Dependencies
         run: |
