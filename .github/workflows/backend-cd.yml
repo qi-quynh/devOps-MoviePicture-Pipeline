@@ -33,10 +33,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install pipenv flake8
   
-      - name: Install dependencies
+      - name: Install project dependencies
         run: |
           pipenv install
-          
+
   testing_job: 
     name: testing job
     runs-on: ubuntu-latest
@@ -52,18 +52,19 @@ jobs:
         with:
           python-version: ${{env.PY_VERSION}}
       
-      - name: Install Dependencies to Tests
+      - name: Install project dependencies to Tests
         run: |
           python -m pip install --upgrade pip
           pip install pipenv pytest
   
-      - name: Install dependencies
+      - name: Install project dependencies
         run: |
           pipenv install
   
       - name: Run tests in Backend
         run: | 
           pipenv run test
+
   build:
     name: building job
     needs: [linting_job, testing_job]
