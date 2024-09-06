@@ -22,24 +22,24 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
 
-      - name: Use NodeJS
+      - name: Use Node
         uses: actions/setup-node@v3
         with:
           node-version: ${{env.NO_VERSION}}
           
-      - name: Cache
+      - name: Setup Cache
         id: cache-npm
         uses: actions/cache@v3
         with:
           path: ~/.npm
           key: npm-cache-${{ hashFiles('**/package-lock.json') }}
           
-      - name: Install dependencies
+      - name: Install project dependencies
         run: |
            npm ci
            npm install eslint --save-dev
 
-      - name: Run lint
+      - name: Lint code
         run: |
           npm run lint
           
@@ -58,19 +58,19 @@ jobs:
         with:
           node-version: ${{env.NO_VERSION}}
       
-      - name: Perform a cache action to restore cache before dependency install
+      - name: Cache test
         id: cache-npm-test
         uses: actions/cache@v3
         with:
           path: ~/.npm
           key: npm-cache-${{ hashFiles('**/package-lock.json') }}
   
-      - name: Install dependencies
+      - name: Install project dependencies
         run: |
           npm ci
           npm install prettier --save-dev
   
-      - name: Run test
+      - name: Run tests in Frontend
         run: npm run test
 
   build:

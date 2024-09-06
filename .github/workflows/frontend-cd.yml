@@ -28,19 +28,19 @@ jobs:
         with:
           node-version: ${{env.NO_VERSION}}
           
-      - name: Cache
+      - name: Setup cache 
         id: cache-npm
         uses: actions/cache@v3
         with:
           path: ~/.npm
           key: npm-cache-${{ hashFiles('**/package-lock.json') }}
           
-      - name: Install dependencies
+      - name: Install project dependencies
         run: |
            npm ci
            npm install eslint --save-dev
 
-      - name: Run lint
+      - name: Lint code
         run: |
           npm run lint
           
