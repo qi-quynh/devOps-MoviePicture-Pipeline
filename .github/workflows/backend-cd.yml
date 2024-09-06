@@ -93,8 +93,8 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           docker build -t ${{env.IMAGE_REPO_NAME}} .
-          docker tag ${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}  ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
-          docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
+          docker tag ${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}  310722232770.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
+          docker push 310722232770.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
 
       - name: Configure Kubeconfig Auth
         working-directory: starter/backend/k8s
@@ -104,7 +104,7 @@ jobs:
       - name: Deploy the Docker image to Amazon EKS
         run: |
           cd k8s
-          kustomize edit set image backend=${{ secrets.ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
+          kustomize edit set image backend=310722232770.dkr.ecr.us-east-1.amazonaws.com/${{env.IMAGE_REPO_NAME}}:${{env.IMAGE_TAG}}
           kustomize build | kubectl apply -f -
       
       - name: Check Status
